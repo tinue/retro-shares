@@ -126,22 +126,7 @@ For automated deployment to remote servers, use the included Ansible playbook.
 
 #### Quick Start
 
-1. If necessary, edit `ansible/vars.yml` with your settings:
-   ```yaml
-   github_repo: "https://github.com/tinue/retro-shares.git"
-   # Docker user (will be created and added to docker group)
-   docker_user: "docker-admin"
-   # Installation path (in docker user's home directory)
-   install_path: "/home/{{ docker_user }}/docker/retro-shares"
-   # SMB credentials
-   smb_user: "retroadmin"
-   smb_password: "retroadmin"
-   # Optional read-only user
-   smb_ro_user: "retro"
-   smb_ro_password: "retro"
-   ```
-
-2. Edit `ansible/inventory.yml` with your server:
+1. Edit `ansible/inventory.yml` with your server:
    ```yaml
    all:
      children:
@@ -151,6 +136,9 @@ For automated deployment to remote servers, use the included Ansible playbook.
              ansible_host: 192.168.1.100
              ansible_user: admin
    ```
+
+2. (Optional) Override default variables via inventory, command line, or vars file.
+   See `ansible/roles/retro_shares/README.md` for all available variables.
 
 3. Run the playbook:
    ```bash
@@ -326,9 +314,15 @@ retro-shares/
 ├── data/               # Shared files (create this)
 ├── ansible/            # Ansible deployment files
 │   ├── playbook.yml    # Main deployment playbook
-│   ├── vars.yml        # Configuration variables
 │   ├── inventory.yml   # Target server inventory
-│   └── README.md       # Ansible documentation
+│   ├── README.md       # Ansible documentation
+│   └── roles/
+│       └── retro_shares/
+│           ├── defaults/
+│           │   └── main.yml   # Default variables
+│           ├── tasks/
+│           │   └── main.yml   # Deployment tasks
+│           └── README.md      # Role documentation
 └── README.md           # This file
 ```
 

@@ -1,6 +1,6 @@
 # Ansible Deployment for Retro Shares
 
-This Ansible playbook automates the deployment of Retro Shares to a remote server.
+This Ansible playbook automates the deployment of Retro Shares to a remote server using the `retro_shares` role.
 
 ## Prerequisites
 
@@ -18,8 +18,8 @@ On the **control machine** (where you run Ansible):
 | File | Description |
 |------|-------------|
 | `playbook.yml` | Main deployment playbook |
-| `vars.yml` | Configuration variables |
 | `inventory.yml` | Target server inventory |
+| `roles/retro_shares/` | Deployment role (see [role documentation](roles/retro_shares/README.md)) |
 
 ## Configuration
 
@@ -37,31 +37,37 @@ all:
           ansible_user: admin
 ```
 
-### 2. Edit vars.yml
+### 2. Override role variables (optional)
 
-Configure the deployment, if necessary:
+The role has sensible defaults, but you can override them in several ways:
+
+**Option A: In the inventory file (per host or group)**
 
 ```yaml
-# Your GitHub repository
-github_repo: "https://github.com/tinue/retro-shares.git"
-github_branch: "main"
-
-# Docker user (will be created and added to docker group)
-docker_user: "docker-admin"
-
-# Installation path (in docker user's home directory)
-install_path: "/home/{{ docker_user }}/docker/retro-shares"
-
-# SMB admin credentials
-smb_user: "retroadmin"
-smb_password: "retroadmin"
-
-# SMB read-only user credentials (optional)
-# Leave empty to disable authenticated read-only access
-smb_ro_user: "guest"
-smb_ro_password: "guest"
+all:
+  children:
+    retro_servers:
+      vars:
+        smb_user: "myadmin"
+        smb_password: "mysecretpassword"
+      hosts:
+        my-retro-server:
+          ansible_host: 192.168.1.100
 ```
 
+**Option B: Via command line extra vars**
+
+```bash
+ansible-playbook -i inventory.yml playbook.yml -e "smb_user=myadmin smb_password=mysecret"
+```
+
+**Option C: Create a separate vars file**
+
+```bash
+ansible-playbook -i inventory.yml playbook.yml -e "@my_vars.yml"
+```
+
+See the [role documentation](roles/retro_shares/README.md) for all available variables.
 
 ## Deployment
 
@@ -84,21 +90,6 @@ ansible-playbook -i inventory.yml playbook.yml --ask-vault-pass
 ansible-playbook -i inventory.yml playbook.yml --ask-become-pass
 ```
 
-
-## What the playbook does
-
-1. Checks if Docker and Docker Compose are installed (fails if not)
-2. Verifies Docker service is running
-3. Installs git if not present
-4. Creates a dedicated docker user and adds it to the docker group
-5. Creates the project directory with correct ownership
-6. Installs acl package (required for Ansible's become_user)
-7. Clones/updates the repository from GitHub as the docker user
-8. Creates the data directory for shared files
-9. Creates `.env` file with SMB credentials
-10. Builds and starts the Docker container as the docker user
-11. Displays connection information
-
 ## Post-deployment
 
 After successful deployment (default paths assume `docker_user: docker-admin`):
@@ -114,4 +105,3 @@ After successful deployment (default paths assume `docker_user: docker-admin`):
    ```
 
 3. Connect from retro clients using `\\RETRO\retro`
-
