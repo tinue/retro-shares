@@ -19,13 +19,21 @@ if [ -z "$SMB_PASSWORD" ]; then
     exit 1
 fi
 
-# Create smbusers group if it doesn't exist
-addgroup -S smbusers 2>/dev/null || true
+# Use PUID/PGID from environment, defaulting to 1000
+PUID=${PUID:-1000}
+PGID=${PGID:-1000}
+echo "Using PUID=$PUID and PGID=$PGID"
 
-# Create the system user if it doesn't exist
+# Create smbusers group with specific GID if it doesn't exist
+if ! getent group smbusers >/dev/null 2>&1; then
+    addgroup -g "$PGID" smbusers 2>/dev/null || addgroup -S smbusers
+fi
+
+# Create the system user with specific UID if it doesn't exist
 if ! id "$SMB_USER" >/dev/null 2>&1; then
-    echo "Creating system user: $SMB_USER"
-    adduser -S -G smbusers -H -s /sbin/nologin "$SMB_USER"
+    echo "Creating system user: $SMB_USER (UID=$PUID)"
+    adduser -u "$PUID" -G smbusers -H -s /sbin/nologin -D "$SMB_USER" 2>/dev/null || \
+        adduser -S -G smbusers -H -s /sbin/nologin "$SMB_USER"
 else
     echo "User $SMB_USER already exists"
     # Ensure user is in smbusers group

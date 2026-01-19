@@ -8,6 +8,8 @@ services:
       - SMB_PASSWORD=${SMB_PASSWORD:?SMB_PASSWORD must be set}
       - SMB_RO_USER=${SMB_RO_USER:-}
       - SMB_RO_PASSWORD=${SMB_RO_PASSWORD:-}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
     volumes:
       # Mount your retro software directory here
       - ./data:/srv/retro

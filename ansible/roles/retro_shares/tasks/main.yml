@@ -81,6 +81,16 @@
     owner: "{{ docker_user }}"
     group: "{{ docker_user }}"
 
+- name: Get docker user UID
+  command: "id -u {{ docker_user }}"
+  register: docker_user_uid
+  changed_when: false
+
+- name: Get docker user GID
+  command: "id -g {{ docker_user }}"
+  register: docker_user_gid
+  changed_when: false
+
 - name: Create .env file with credentials
   copy:
     content: |
@@ -88,6 +98,8 @@
       SMB_PASSWORD={{ smb_password }}
       SMB_RO_USER={{ smb_ro_user | default('') }}
       SMB_RO_PASSWORD={{ smb_ro_password | default('') }}
+      PUID={{ docker_user_uid.stdout }}
+      PGID={{ docker_user_gid.stdout }}
     dest: "{{ install_path }}/.env"
     mode: '0600'
     owner: "{{ docker_user }}"
