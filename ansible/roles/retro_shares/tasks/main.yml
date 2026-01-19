@@ -41,7 +41,6 @@
 - name: Create docker user
   user:
     name: "{{ docker_user }}"
-    shell: /bin/bash
     create_home: yes
     state: present
 

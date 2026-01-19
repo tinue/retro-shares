@@ -114,6 +114,24 @@ docker compose logs -f
 
 You should see output indicating Samba services have started.
 
+### Autostart on Server Reboot
+
+The container is configured with `restart: unless-stopped`, which means it will automatically restart after a server reboot as long as:
+
+1. **Docker is configured to start on boot.** On most Linux distributions with systemd, enable this with:
+   ```bash
+   sudo systemctl enable docker
+   ```
+
+2. **The container was not manually stopped** before the reboot. If you run `docker compose down`, the container will not restart automatically until you start it again with `docker compose up -d`.
+
+To verify autostart is working after a reboot:
+```bash
+docker compose ps
+```
+
+If you prefer the container to always restart (even after manual stops), edit `docker-compose.yml` and change `restart: unless-stopped` to `restart: always`.
+
 ### Option B: Ansible Deployment
 
 For automated deployment to remote servers, use the included Ansible playbook.
@@ -331,10 +349,10 @@ retro-shares/
 
 Testing is limited, as I don't have the full range of legacy machines available.
 The tests were performed on an IBM Thinkpad T40 or T42p. This machine supports a wide range of
-old operating systems£: PC DOS 2000, Windows 98SE / ME, and Windows NT 4.0 up to XP. In addition,
+old operating systems: PC DOS 2000, Windows 98SE / ME; Windows NT 4.0 up to XP. In addition,
 OS/2 Warp 4.52 works fine on this hardware.
 
-* PC DOS 2000, MS NMetwork Client 3.0: Anonymous not tested, authenticated ok 
+* PC DOS 2000, MS Network Client 3.0: Anonymous not tested, authenticated ok 
 * OS/2 Warp 4.52: Anonymous not tested, authenticated ok
 * Windows 98 SE: Anonymous ok, authenticated not tested
 * Windows NT Workstation 4.0: Anonymous ok, authenticated not tested
