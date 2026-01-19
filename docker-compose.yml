@@ -1,0 +1,18 @@
+services:
+  retro-shares:
+    build: .
+    container_name: retro-shares
+    hostname: retro
+    environment:
+      - SMB_USER=${SMB_USER:-retroadmin}
+      - SMB_PASSWORD=${SMB_PASSWORD:?SMB_PASSWORD must be set}
+      - SMB_RO_USER=${SMB_RO_USER:-}
+      - SMB_RO_PASSWORD=${SMB_RO_PASSWORD:-}
+    volumes:
+      # Mount your retro software directory here
+      - ./data:/srv/retro
+    restart: unless-stopped
+    # Host networking is required for NetBIOS broadcast support
+    # This allows legacy clients to discover the server via network browsing
+    # Ports used: 137/udp, 138/udp (NetBIOS), 139/tcp (SMB over NetBIOS), 445/tcp (Direct SMB)
+    network_mode: host

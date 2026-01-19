@@ -1,0 +1,24 @@
+---
+# GitHub repository settings
+github_repo: "https://github.com/tinue/retro-shares.git"
+github_branch: "main"
+
+# Docker user settings
+docker_user: "docker-admin"
+
+# Installation path on target server (in docker user's home directory)
+install_path: "/home/{{ docker_user }}/docker/retro-shares"
+
+# Samba admin user credentials (read-write access)
+# Note: The entire server is so vastly insecure (e.g. passwords are going over the network in plain text)
+#  that it really doesn't matter if these passwords are in cleartext here. The distinction between read-only
+#  and read-write is about preventing accidental modifications, and not actual security.
+# Nevertheless: If you want you can make this secure, e.g. by using ansible vault to encrypt these variables.
+smb_user: "retroadmin"
+smb_password: "retroadmin"
+
+# Samba read-only user credentials (optional)
+# Leave empty ("") to disable authenticated read-only access
+# Anonymous read-only access is always available regardless of this setting
+smb_ro_user: "retro"
+smb_ro_password: "retro"
